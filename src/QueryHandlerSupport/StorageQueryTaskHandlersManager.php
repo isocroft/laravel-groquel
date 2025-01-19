@@ -3,6 +3,7 @@
 namespace Groquel\Laravel\QueryHandlerSupport;
 
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
+use Groquel\Laravel\QueryHandlers\StorageQueryTask;
 
 /* @HINT: This is a storage query task manger for all data access an storage needs of a data repository. */
 
