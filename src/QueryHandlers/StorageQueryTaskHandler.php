@@ -1,5 +1,7 @@
 <?php
 
+namespace Groquel\Laravel\QueryHandlers;
+
 interface StorageQueryTask {
   public function getQueryTaskResult (): array | string | int
 }
