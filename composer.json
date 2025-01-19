@@ -1,6 +1,6 @@
 {
   "name": "isocroft/laravel-groquel",
-  "description": "",
+  "description": "A system of handlers used to make data access from I/O sources more efficient for Laravel PHP apps",
   "keywords": [
     "laravel",
     "eloquent",
@@ -16,7 +16,7 @@
   "authors": [
       { "name": "Ifeora Okechukwu", "homepage": "https://isocroft.vercel.app", "role": "Creator" }
   ],
-  "license": "MIT",
+  "license": "GPL v3",
   "require": {
     "php": "^7.2|^8.1",
     "composer-runtime-api": "^2.0.0",
