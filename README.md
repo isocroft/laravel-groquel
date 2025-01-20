@@ -1,5 +1,5 @@
 # Laravel-Groquel
-A system of handlers used to make data access from I/O sources more efficient for Laravel PHP apps
+A system of handlers used to make data access from I/O sources more efficient for Laravel v10+ PHP apps
 
 ## Usage
 
