@@ -2,9 +2,7 @@
 
 namespace Groquel\Laravel\QueryHandlers;
 
-interface StorageQueryTask {
-  public function getQueryTaskResult (): array | string | int
-}
+use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 /* @INFO: This abstract class implements the Chain-of-Responsibility design pattern */
 
