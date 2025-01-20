@@ -11,7 +11,7 @@ abstract class GroquelServiceProvider extends ServiceProvider
     public function getHandlerInstances () {
        return array(
          'default_cache_handler_instance' => new CacheQueryTaskHandler("");
-         'default_db_handler_instance' => new DatabaseQueryTaskHandler("");
+         'default_db_handler_instance' => new DatabaseQueryTaskHandler();
        );
     }
     /**
@@ -21,12 +21,11 @@ abstract class GroquelServiceProvider extends ServiceProvider
     {
         $this->app->bind(DatabaseQueryTaskHandler::class, function (Container $app) {
           return new DatabaseQueryTaskHandler(
-            ""
           )
         });
         $this->app->bind(CacheQueryTaskHandler::class, function (Container $app) {
           return new CacheQueryTaskHandler(
-            ""
+            // CacheStore 'illuminate/cache'
           )
         });
     }
