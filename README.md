@@ -29,9 +29,9 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
   }
 
   public final getAllActiveUsers () {
-    $context = $this;
+    $context = &$this;
     $queryOneBuilder = User::where(function (Builder $query) {
-      $query->whereNot('status', '=', 'suspended')
+      $query->whereNot('status', '=', 'suspended');
     });
 
     $this->executeGetOnQuery(
@@ -39,8 +39,10 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
     )->setQueryTaskName("step1");
 
     $this->executeGetOnQuery(
-      function (array $arguments) use (&$context) {
-        $innerQueryBuilder = $this->getQueryBuilder()
+      function (array $arguments) use ($context) {
+        $innerQueryBuilder = $context->getQueryBuilder()
+
+        $innerQueryBuilder->orderBy('created_at')->groupBy('status')
         return $innerQueryBuilder;
       }
     )->setQueryTaskName("step2");
