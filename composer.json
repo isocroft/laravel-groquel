@@ -7,7 +7,7 @@
     "repositories",
     "executors"
   ],
-  "homepage": "https://github.com/mongodb/laravel-groquel",
+  "homepage": "https://github.com/isocroft/laravel-groquel",
   "support": {
       "issues": "https://github.com/isocroft/laravel-groquel/issues",
       "security": "https://github.com/isocroft/laravel-groquel/issues"
