@@ -12,7 +12,7 @@ use Groquel\Laravel\QueryRepository\SQLDatabaseTableRepository;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
-final class UserTableRepository extends   {
+final class UserTableRepository extends SQLDatabaseTableRepository {
   /**
     * 
     */
