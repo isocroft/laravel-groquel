@@ -30,4 +30,5 @@ abstract class GroquelServiceProvider extends ServiceProvider
           )
         });
     }
+}
 ?>
