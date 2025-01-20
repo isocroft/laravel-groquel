@@ -4,7 +4,7 @@ namespace Groquel\Laravel\QueryHandlerTasks;
 
 use Closure;
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
-use Groquel\Laravel\QueryHandlers\StorageQueryTask;
+use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
