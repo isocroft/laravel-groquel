@@ -56,12 +56,13 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
 
   public function getQuerySql (): string {
     if ($this->queryBuilder instanceof Closure) {
-      return "";
+      return $this->getQueryTaskName();
     }
 
     if (method_exists($this->queryBuilder, 'toSql')) {
       return $this->queryBuilder->toSql();
     }
+
     return "";
   }
 
