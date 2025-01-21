@@ -66,7 +66,7 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     return "";
   }
 
-  public function getTaskResult () {
+  public function getQueryTaskResult () {
     $trigger = $this->trigger;
     $canCallTrigger = $trigger !== "";
 
