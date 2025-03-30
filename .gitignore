@@ -1,7 +1,15 @@
+# IDE
+.idea
+
+# Composer
+/build/
 /vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
+# /composer.lock
+
+# Envs
+.env
+.env.backup
+.env.production
 
 # Laravel 4 specific
 bootstrap/compiled.php
@@ -15,16 +23,25 @@ public/hot
 public_html/storage
 public_html/hot
 
+# Dev Box
 storage/*.key
-.env
 Homestead.yaml
 Homestead.json
 /.vagrant
+
+# PHPUnit
+phpunit.xml
+phpunit.cache
 .phpunit.result.cache
+
+# PHPStan
+phpstan.neon
+
+# PHPCSfixer
+.php-cs-fixer.php
+.php-cs-fixer.cache
 
 /public/build
 /storage/pail
-.env.backup
-.env.production
 .phpactor.json
 auth.json
