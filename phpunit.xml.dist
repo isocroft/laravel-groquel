@@ -8,7 +8,7 @@
     shortenArraysForExportThreshold="10"
     requireCoverageMetadata="true"
     beStrictAboutCoverageMetadata="false"
-    beStrictAboutOutputDuringTests=true"
+    beStrictAboutOutputDuringTests="true"
     failOnRisky="true"
     failOnWarning="true">
     <testsuites>
