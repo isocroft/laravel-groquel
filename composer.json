@@ -40,7 +40,7 @@
     "rector/rector": "^1.2"
   },
   "scripts": {
-    "test": "./vendor/bin/phpunit --testsuite Unit",
+    "test": "./vendor/bin/phpunit",
     "test:coverage": "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
     "lint": "./vendor/bin/phpstan analyse",
     "prettify:src": "./vendor/bin/php-cs-fixer fix src",
