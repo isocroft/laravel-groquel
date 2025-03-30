@@ -13,7 +13,7 @@
     failOnWarning="true">
     <testsuites>
         <testsuite name="Functional">
-            <directory>./tests</directory>
+            <directory>./tests/Functional</directory>
         </testsuite>
     </testsuites>
     <source ignoreIndirectDDeprecation="true" restrictNotices="true">
