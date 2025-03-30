@@ -9,11 +9,15 @@
   ],
   "homepage": "https://github.com/isocroft/laravel-groquel",
   "support": {
-      "issues": "https://github.com/isocroft/laravel-groquel/issues",
-      "security": "https://github.com/isocroft/laravel-groquel/issues"
+    "issues": "https://github.com/isocroft/laravel-groquel/issues",
+    "security": "https://github.com/isocroft/laravel-groquel/issues"
   },
   "authors": [
-      { "name": "Ifeora Okechukwu", "homepage": "https://isocroft.vercel.app", "role": "Creator" }
+    {
+      "name": "Ifeora Okechukwu",
+      "homepage": "https://isocroft.vercel.app",
+      "role": "Creator"
+    }
   ],
   "license": "GPL v3",
   "require": {
@@ -25,13 +29,23 @@
     "illuminate/support": "^10.0|^11",
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.3",
+    "phpunit/phpunit": "^11.5",
     "orchestra/testbench": "^8.0|^9.0",
     "mockery/mockery": "^1.4.4",
     "doctrine/coding-standard": "12.0.x-dev",
     "spatie/laravel-query-builder": "^5.6",
-    "phpstan/phpstan": "^1.10",
+    "phpstan/phpstan": "^1.12",
+    "phpstan/phpstan-strict-rules": "^1.6",
+    "friendsofphp/php-cs-fixer": "^3.74",
     "rector/rector": "^1.2"
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit --testsuite Unit",
+    "test:coverage": "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+    "lint": "./vendor/bin/phpstan analyse",
+    "prettify:src": "./vendor/bin/php-cs-fixer fix src",
+    "check:all": "./vendor/bin/php-cs-fixer check",
+    "refactor:upgrade": "rector"
   },
   "minimum-stability": "dev",
   "autoload": {
@@ -50,12 +64,5 @@
         "Groquel\\Laravel\\GroquelServiceProvider"
       ]
     }
-  },
-  "scripts": {
-      "test": "phpunit",
-      "test:coverage": "phpunit --coverage-clover ./coverage.xml",
-      "cs": "phpcs",
-      "cs:fix": "phpcbf",
-      "rector": "rector"
-  },
+  }
 }
