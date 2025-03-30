@@ -14,3 +14,4 @@ return (new PhpCsFixer\Config())
         'align_multiline_comment' => false
     ])
     ->setFinder($finder)
+;
