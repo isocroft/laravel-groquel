@@ -16,7 +16,7 @@
             <directory>./tests/Functional</directory>
         </testsuite>
     </testsuites>
-    <source ignoreIndirectDDeprecation="true" restrictNotices="true">
+    <source ignoreIndirectDeprecation="true" restrictNotices="true">
         <include>
             <directory>./src</directory>
         </include>
