@@ -4,7 +4,7 @@ namespace Groquel\Laravel;
 use Groquel\Laravel\QueryHandlers\CacheQueryTaskHandler;
 use Groquel\Laravel\QueryHandlers\DatabaseQueryTaskHandler;
 
-use Illuminate\Container\Container;
+//use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
 
 abstract class GroquelServiceProvider extends ServiceProvider
@@ -18,7 +18,7 @@ abstract class GroquelServiceProvider extends ServiceProvider
           return new DatabaseQueryTaskHandler(
           )
         });
-        $this->app->bind(CacheQueryTaskHandler::class, function (Container $app) {
+        $this->app->bind(CacheQueryTaskHandler::class, function (/* Container $app */) {
           return new CacheQueryTaskHandler(
           )
         });
