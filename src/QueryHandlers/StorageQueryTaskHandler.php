@@ -2,6 +2,8 @@
 
 namespace Groquel\Laravel\QueryHandlers;
 
+use \Exception as Exception;
+
 use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 /* @INFO: This abstract class implements the Chain-of-Responsibility design pattern */
