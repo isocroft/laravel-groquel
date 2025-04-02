@@ -9,12 +9,6 @@ use Illuminate\Support\ServiceProvider;
 
 abstract class GroquelServiceProvider extends ServiceProvider
 {
-    public function getHandlerInstances () {
-       return array(
-         'default_cache_handler_instance' => new CacheQueryTaskHandler("");
-         'default_db_handler_instance' => new DatabaseQueryTaskHandler();
-       );
-    }
     /**
      * Register the service provider.
      */
