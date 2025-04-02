@@ -1,6 +1,8 @@
 <?php
 namespace Groquel\Laravel\QueryHandlers;
 
+use \Exception as Exception;
+
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
@@ -11,7 +13,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     * @param string $queryKey
     * @return boolean
     */
-  private function canQuery(string $queryKey) {
+  private function canQuery(string $queryKey): boolean {
     return QueryCache::has($queryKey);
   }
   /**
@@ -25,20 +27,28 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     $sql = $queryTask->getQuerySql();
 
     if ($sql !== "") {
-      $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" || strtolower(substr($sql, 0, 10)) === "db_select:")
-        && strpos(strtolower($sql), "join") === false;
+      $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
+        and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
       $isSQLDatabaseQueryTask = true
     }
 
-    if (!canProceedWithProcessing) {
+    if (!canProceedWithProcessing or !$isSQLDatabaseQueryTask) {
       return $this->skipHandlerProcessing();
     }
 
-    /* @TODO: More code here... */
+    $queryHash = md5($sql);
+    $isCacheHit = $this->canQuery($queryHash);
+
+    if ($isCacheHit) {
+      return QueryCache::get($queryHash);
+    }
+
+    return $this->skipHandlerProcessing();
   }
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
+    * @param mixed $result
     * @return void
     * @throws Exception
     */
@@ -53,7 +63,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
-      
+    $queryName = $queryTask->getQueryTaskName();
+    throw new Exception("Caching query task='".$queryName."' failed; reason: ('".$error->getMessage()."')")
   }
 
   /**
