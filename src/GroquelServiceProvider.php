@@ -20,7 +20,6 @@ abstract class GroquelServiceProvider extends ServiceProvider
         });
         $this->app->bind(CacheQueryTaskHandler::class, function (Container $app) {
           return new CacheQueryTaskHandler(
-            // CacheStore 'illuminate/cache'
           )
         });
     }
