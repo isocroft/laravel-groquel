@@ -7,8 +7,9 @@
     "repositories",
     "executors"
   ],
-  "homepage": "https://github.com/isocroft/laravel-groquel",
+  "homepage": "https://github.com/isocroft/laravel-groquel#readme",
   "support": {
+    "source": "https://github.com/isocroft/laravel-groquel",
     "issues": "https://github.com/isocroft/laravel-groquel/issues",
     "security": "https://github.com/isocroft/laravel-groquel/issues"
   },
@@ -16,6 +17,7 @@
     {
       "name": "Ifeora Okechukwu",
       "homepage": "https://isocroft.vercel.app",
+      "email":  "isocroft@gmail.com",
       "role": "Creator"
     }
   ],
@@ -23,7 +25,6 @@
   "require": {
     "php": "^8.0",
     "composer-runtime-api": "^2.0.0",
-    "illuminate/cache": "^10.36|^11",
     "illuminate/container": "^10.0|^11",
     "illuminate/database": "^10.30|^11",
     "illuminate/support": "^10.0|^11",
@@ -43,9 +44,12 @@
     "test": "./vendor/bin/phpunit --testsuite Functional",
     "test:coverage": "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
     "lint": "./vendor/bin/phpstan analyse",
-    "prettify:src": "./vendor/bin/php-cs-fixer fix src",
-    "check:all": "./vendor/bin/php-cs-fixer check",
-    "refactor:upgrade": "./vendor/bin/rector"
+    "prettify:fix": "./vendor/bin/php-cs-fixer fix src",
+    "prettify:check": "./vendor/bin/php-cs-fixer check",
+    "refactor": "./vendor/bin/rector"
+  },
+  "config": {
+    "sort-packages": true
   },
   "minimum-stability": "dev",
   "autoload": {
