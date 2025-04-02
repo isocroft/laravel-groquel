@@ -1,6 +1,8 @@
 <?php
 namespace Groquel\Laravel\QueryHandlers;
 
+use \Exception as Exception;
+
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHanddler;
 use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
