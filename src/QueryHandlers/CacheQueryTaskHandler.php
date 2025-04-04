@@ -57,7 +57,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     $isSQLDatabaseQueryTask = false;
     $sql = $queryTask->getQuerySql();
 
-    if (!isset($result) or $sql !== "") {
+    if (isset($result) and $sql !== "") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
         and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
       $isSQLDatabaseQueryTask = true
