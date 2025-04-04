@@ -53,7 +53,27 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask, $result): void {
+    $canProceedWithProcessing = false;
+    $isSQLDatabaseQueryTask = false;
+    $sql = $queryTask->getQuerySql();
+
+    if (!isset($result) or $sql !== "") {
+      $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
+        and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
+      $isSQLDatabaseQueryTask = true
+    }
+
+    if (!canProceedWithProcessing or !$isSQLDatabaseQueryTask) {
+      return;
+    }
       
+    $queryHash = md5($sql);
+    $ttl = 2300;
+    $isCacheMiss = !$this->canQuery($queryHash);
+
+    if (isCacheMiss) {
+      QueryCache::put($queryHash, $result, $ttl);
+    }
   }
 
   /**
@@ -73,7 +93,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
-    
+    $queryName = $queryTask->getQueryTaskName();
+    throw new Exception("Caching query task='".$queryName."' failed; reason: unknwon");
   }
 }
 
