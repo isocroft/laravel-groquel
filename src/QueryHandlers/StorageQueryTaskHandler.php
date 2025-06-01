@@ -41,8 +41,10 @@ abstract class StorageQueryTaskHandler {
    * @return void
    */
   public final function unsetNextHandler(): void {
-    $this->nextHandler->unsetNextHandler();
-    $this->nextHandler = NULL;
+    if ($this->nextHandler !== NULL) {
+      $this->nextHandler->unsetNextHandler();
+      $this->nextHandler = NULL;
+    }
   }
 
   /**
