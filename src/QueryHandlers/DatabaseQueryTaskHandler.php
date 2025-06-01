@@ -32,7 +32,8 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
-      
+    $queryName = $queryTask->getQueryTaskName();
+    throw new Exception("Database query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
   }
 
   /**
@@ -41,7 +42,8 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
-    
+    $queryName = $queryTask->getQueryTaskName();
+    throw new Exception("Database query task='".$queryName."' failed; reason: unknown");
   }
 }
 
