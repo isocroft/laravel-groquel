@@ -25,7 +25,7 @@ abstract class StorageQueryTaskHandler {
   }
 
   public function __destruct() {
-    $this->nextHandler = NULL;
+    $this->unsetNextHandler();
     $this->message = "";
   }
 
@@ -38,41 +38,59 @@ abstract class StorageQueryTaskHandler {
   }
 
   /**
+   * @return void
+   */
+  public final function unsetNextHandler(): void {
+    $this->nextHandler->unsetNextHandler();
+    $this->nextHandler = NULL;
+  }
+
+  /**
     * @param StorageQueryTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   protected abstract function beginProcessing(StorageQueryTask $queryTask);
 
   /**
     * @param StorageQueryTask $queryTask
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
   protected abstract function finalizeProcessing(StorageQueryTask $queryTask, $result): void;
 
   /**
     * @param StorageQueryTask $queryTask
     * @param Exception $error
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
   protected abstract function finalizeProcessingWithError(StorageQueryTask $queryTask, Exception $error): void;
 
   /**
     * @param StorageQueryTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   protected abstract function alternateProcessing(StorageQueryTask $queryTask);
 
   /**
-    * @param Exception $error
+    * @param Exception|null $error
     * @throws Exception
+    *
+    * @return void
     */
-  public final function skipHandlerProcessing(Exception $error): void {
-    if ($this->nextHandler === null) {
-      throw $error;
+  public final function skipHandlerProcessing(Exception $error = null): void {
+    if ($this->nextHandler === NULL) {
+      if ($error !== NULL) {
+        throw $error;
+      } else {
+        throw new Exception("Cannot skip; next handler after this handler: '".get_called_class()."' is NULL");
+      }
     }
     throw new Exception($this->message);
   }
@@ -87,8 +105,9 @@ abstract class StorageQueryTaskHandler {
 
   /**
     * @param StorageQueryTask $queryTask
-    * @return StorageQueryTask
     * @throws Exception
+    *
+    * @return StorageQueryTask
     */
   protected function migrateQueryTask(StorageQueryTask $queryTask): StorageQueryTask {
     return $queryTask;
@@ -105,6 +124,11 @@ abstract class StorageQueryTaskHandler {
     $noResult = true;
     $hasError = false;
 
+    /* @HINT:
+    
+        Using the template method pattern to ensure each handler 
+        doesn't forget to call the next handler.
+    */
     try {
       try {
         $result = $this->beginProcessing(
