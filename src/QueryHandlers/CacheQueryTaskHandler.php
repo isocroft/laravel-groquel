@@ -84,7 +84,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
     $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Caching query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
+    throw new Exception("Cache query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
   }
 
   /**
@@ -94,7 +94,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Caching query task='".$queryName."' failed; reason: unknown");
+    throw new Exception("Cache query task='".$queryName."' failed; reason: unknown");
   }
 }
 
