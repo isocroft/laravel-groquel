@@ -18,13 +18,14 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   }
   /**
     * @param EloquentQueryBuilderTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySqlString();
+    $sql = $queryTask->getQuerySqlString();/* @HINT: $sql = "select * from users|users" */
 
     if ($sql !== "") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
@@ -36,7 +37,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
       return $this->skipHandlerProcessing();
     }
 
-    $queryHash = md5($sql);
+    $queryHash = strpos($sql, "|") !== false
+      ? md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1)
+      : md5($sql);/* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
     $isCacheHit = $this->canQuery($queryHash);
 
     if ($isCacheHit) {
@@ -49,13 +52,14 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   /**
     * @param EloquentQueryBuilderTask $queryTask
     * @param mixed $result
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
   protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask, $result): void {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySqlString();
+    $sql = $queryTask->getQuerySqlString();/* @HINT: $sql = "select * from users|users" */
 
     if (isset($result) and $sql !== "") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
@@ -67,7 +71,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
       return;
     }
       
-    $queryHash = md5($sql);
+    $queryHash = strpos($sql, "|") !== false
+      ? md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1)
+      : md5($sql);/* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
     $ttl = 2300;
     $isCacheMiss = !$this->canQuery($queryHash);
 
@@ -79,8 +85,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   /**
     * @param EloquentQueryBuilderTask $queryTask
     * @param Exception $error
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
     $queryName = $queryTask->getQueryTaskName();
@@ -89,8 +96,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
