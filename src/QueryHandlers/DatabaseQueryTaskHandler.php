@@ -13,7 +13,7 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHanddler {
     * @throws Exception
     */
   protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
-    
+    return $queryTask->getQueryTaskResults();
   }
 
   /**
