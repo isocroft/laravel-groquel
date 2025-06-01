@@ -16,11 +16,13 @@ abstract class GroquelServiceProvider extends ServiceProvider
     {
         $this->app->bind(DatabaseQueryTaskHandler::class, function () {
           return new DatabaseQueryTaskHandler(
-          )
+            "database: error message to skip processing"
+          );
         });
         $this->app->bind(CacheQueryTaskHandler::class, function (/* Container $app */) {
           return new CacheQueryTaskHandler(
-          )
+            "cache: error message to skip processing"
+          );
         });
     }
 }
