@@ -86,10 +86,10 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     }
 
     if (method_exists($this->queryBuilder, 'toSql')) {
-      return $this->getQueryBuilderSqlString().":".$this->queryBuilder->getModel()->getTable();
+      return strtolower($this->getQueryBuilderSqlString())."|".strtolower($this->queryBuilder->getModel()->getTable());
     }
 
-    return "";
+    return "|";
   }
 
   /**
