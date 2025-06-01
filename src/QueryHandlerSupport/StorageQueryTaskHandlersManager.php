@@ -2,7 +2,7 @@
 
 namespace Groquel\Laravel\QueryHandlerSupport;
 
-use Exception;
+use \Exception as Exception;
 
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
