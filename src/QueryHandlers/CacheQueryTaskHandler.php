@@ -25,9 +25,11 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySqlString();/* @HINT: $sql = "select * from users|users" */
 
-    if ($sql !== "") {
+    /* @HINT: $sql = "select * from users|users" */
+    $sql = $queryTask->getQuerySqlString();
+
+    if ($sql !== "|") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
         and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
       $isSQLDatabaseQueryTask = true
@@ -37,9 +39,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
       return $this->skipHandlerProcessing();
     }
 
-    $queryHash = strpos($sql, "|") !== false
-      ? md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1)
-      : md5($sql);/* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
+    /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
+    $queryHash = md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1);
     $isCacheHit = $this->canQuery($queryHash);
 
     if ($isCacheHit) {
@@ -59,9 +60,11 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask, $result): void {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySqlString();/* @HINT: $sql = "select * from users|users" */
 
-    if (isset($result) and $sql !== "") {
+    /* @HINT: $sql = "select * from users|users" */
+    $sql = $queryTask->getQuerySqlString();
+
+    if (isset($result) and $sql !== "|") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
         and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
       $isSQLDatabaseQueryTask = true
@@ -70,10 +73,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     if (!canProceedWithProcessing or !$isSQLDatabaseQueryTask) {
       return;
     }
-      
-    $queryHash = strpos($sql, "|") !== false
-      ? md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1)
-      : md5($sql);/* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
+
+    /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
+    $queryHash = md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1);
     $ttl = 2300;
     $isCacheMiss = !$this->canQuery($queryHash);
 
