@@ -8,6 +8,8 @@ use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
+use Illuminate\Support\Facades\Str;
+
 final class EloquentQueryBuilderTask implements StorageQueryTask {
   /**
    * @var QueryBuilder|Closure $queryBuilder
@@ -42,6 +44,10 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $this->queryTaskName = "";
   }
 
+  public function getQueryBuilderSqlString (): string {
+    return Str::replaceArray('?', $this->queryBuilder->getBindings(), $this->queryBuilder->toSql());
+  }
+
   public function setQueryTaskName (string $newQueryTaskName): void {
     $this->queryTaskName = $newQueryTaskName;
   }
@@ -54,13 +60,13 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $this->callbackArguments = $newCallbackArguments;
   }
 
-  public function getQuerySql (): string {
+  public function getQuerySqlString (): string {
     if ($this->queryBuilder instanceof Closure) {
       return $this->getQueryTaskName();
     }
 
     if (method_exists($this->queryBuilder, 'toSql')) {
-      return $this->queryBuilder->toSql();
+      return $this->getQueryBuilderSqlString();
     }
 
     return "";
