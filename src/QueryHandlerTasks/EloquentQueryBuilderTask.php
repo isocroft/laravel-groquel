@@ -41,6 +41,11 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
    */
   private $executed;
 
+  /**
+   * @param QueryBuilder|Clousre $queryBuilder
+   * @param string $nameOfMethodToCall
+   * @param array $methodArguments
+   */
   public function __construct (QueryBuilder|Clousre $queryBuilder, string $nameOfMethodToCall = "", array $methodArguments = []) {
     $this->queryBuilder = $queryBuilder;
     $this->trigger = $nameOfMethodToCall;
@@ -80,6 +85,9 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $this->callbackArguments = $newCallbackArguments;
   }
 
+  /**
+   * @return string
+   */
   public function getQuerySqlString (): string {
     if ($this->queryBuilder instanceof Closure) {
       return $this->getQueryTaskName();
@@ -109,9 +117,9 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $queryBuilder = $this->queryBuilder;
     $result = NULL;
 
-    if (is_callable($this->queryBuilder)) {
+    if (is_callable(queryBuilder)) {
       $result = call_user_func_array(
-        $this->queryBuilder,
+        $queryBuilder,
         $this->callbackArguments
       );
     }
