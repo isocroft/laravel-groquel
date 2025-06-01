@@ -24,7 +24,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySql();
+    $sql = $queryTask->getQuerySqlString();
 
     if ($sql !== "") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
@@ -55,7 +55,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
   protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask, $result): void {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
-    $sql = $queryTask->getQuerySql();
+    $sql = $queryTask->getQuerySqlString();
 
     if (isset($result) and $sql !== "") {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
@@ -84,7 +84,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
     $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Caching query task='".$queryName."' failed; reason: ('".$error->getMessage()."')")
+    throw new Exception("Caching query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
   }
 
   /**
@@ -94,7 +94,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Caching query task='".$queryName."' failed; reason: unknwon");
+    throw new Exception("Caching query task='".$queryName."' failed; reason: unknown");
   }
 }
 
