@@ -12,7 +12,7 @@ use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerSupport\StorageQueryTaskHandlersManager;
 
-use lluminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 
 final class FluentSQLQueryBuilderExecutor {
   /**
@@ -25,14 +25,20 @@ final class FluentSQLQueryBuilderExecutor {
    */
   private $queryManager;
 
+  /**
+   * @param StorageQueryTaskHandlersManager $queryManager
+   */
   public function __construct (StorageQueryTaskHandlersManager $queryManager) {
     $this->queryBuilderTasks = [];
     $this->queryManager = $queryManager;
   }
 
+  /**
+   * @return void
+   */
   public function __destruct () {
-    $this->queryBuilderTasks = null;
-    $this->queryManager = null;
+    $this->queryBuilderTasks = NULL;
+    $this->queryManager = NULL;
   }
 
   /**
@@ -45,7 +51,11 @@ final class FluentSQLQueryBuilderExecutor {
   }
 
   /**
-   * 
+   *
+   * @param QueryBuilder|Closure $queryBuilder
+   * @param string $nameOfDeferedMethodToCall
+   * @param array $defferedMethodArguments
+   *
    * @return EloquentQueryBuilderTask
    */
   public function recordExecutorBuilderTask (QueryBuilder|Closure $queryBuilder, string $nameOfDeferedMethodToCall, array $defferedMethodArguments = []) {
@@ -59,6 +69,9 @@ final class FluentSQLQueryBuilderExecutor {
     return $queryBuilderTask;
   }
 
+  /**
+   * @return string
+   */
   public function getLastExecutedSQLQueryAsString (): string {
     $lastElementKey = end(array_keys($this->queryBuilderTask));
     while ($lastElementKey > 0) {
@@ -72,7 +85,9 @@ final class FluentSQLQueryBuilderExecutor {
   }
 
   /**
+   *
    * @throws Exception
+   *
    * @return array
    */
   public function extractExecutorResults () {
@@ -101,36 +116,39 @@ final class FluentSQLQueryBuilderExecutor {
   }
 }
 
+
+
 abstract class SQLDatabaseTableRepository {
   /**
-    * @var FluentSQLQueryBuilderExecutor $executor
-    */
+   * @var FluentSQLQueryBuilderExecutor $executor
+   */
   private $executor;
 
   /**
-    * @var RootModel|null $dataModel
-    */
+   * @var RootModel|null $dataModel
+   */
   private $dataModel;
 
   /**
-    * @param StorageQueryTaskHandler[] $storageQueryHandlers
-    * @throws Exception
-    */
+   * @param StorageQueryTaskHandler[] $storageQueryHandlers
+   * @throws Exception
+   */
   public function __construct (array $storageQueryHandlers = [], RootModel $dataModel = null) {
     $queryManager = new StorageQueryHandlersManager($storageQueryHandlers);
     $this->executor = new FluentSQLQueryBuilderExecutor($queryManager);
     $this->dataModel = $dataModel;
-    $this->queriesExcecutedQueue = [];
   }
 
+  /**
+   * @return  void
+   */
   public function __destruct () {
-    $this->executor = null;
-    $this->dataModel = null;
+    $this->executor = NULL;
+    $this->dataModel = NULL;
   }
 
   /**
    *
-   * @param QueryBuilder $queryBuilder
    * @return string
    */
   protected function getLastExecutedSQLQueryAsString (): string {
@@ -139,8 +157,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
     * 
-    * @return string
     * @throws Exception
+    *
+    * @return string
     */
   public function getTableName(): string {
     if (is_null($this->dataModel)) {
@@ -152,8 +171,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
     * 
-    * @return QueryBuilder
     * @throws Exception
+    *
+    * @return QueryBuilder
     */
   protected function getQueryBuilder(): QueryBuilder {
     if (is_null($this->dataModel)) {
@@ -175,24 +195,48 @@ abstract class SQLDatabaseTableRepository {
   }
 
   /**
-   * @param QueryBuilder $queryBuilder
-   * @param string|null $conflictColumn
    *
-   * @return QueryBuidler
-   */
-  final protected function whenConflict(QueryBuilder $queryBuilder, string $conflictColumn = null): QueryBuilder {
-    return $conflictColumn !== null ? $queryBuilder->onConflict($conflictColumn) : $queryBuilder;
-  }
-
-  /**
+   * @param QueryBuilder $queryBuilder
+   * @param array $columns
+   * @param string $operator
+   * @param mixed $value
    *
    * @return QueryBuilder
    */
-  final protected function merge(QueryBuilder $queryBuilder, array $columnsToMerge = []): QueryBuilder {  
-    return !empty($columnsToMerge) ? $queryBuilder->merge($columnsToMerge) : $queryBuilder->merge();
+  final protected function whereAll(QueryBuilder $queryBuilder, array $columns = [], string $operator = "like", $value = "%.*%"): QueryBuilder {
+    return !empty($columns) ? $queryBuilder->whereAll($columns, $operator, $value) : $queryBuilder;
   }
 
   /**
+   *
+   * @param QueryBuilder $queryBuilder
+   * @param array $columns
+   * @param string $operator
+   * @param mixed $value
+   *
+   * @return QueryBuilder
+   */
+  final protected function whereNone(QueryBuilder $queryBuilder, array $columns = [], string $operator = "like", $value = "%.*%"): QueryBuilder {
+    return !empty($columns) ? $queryBuilder->whereNone($columns, $operator, $value) : $queryBuilder;
+  }
+
+  /**
+   *
+   * @param QueryBuilder $queryBuilder
+   * @param array $columns
+   * @param string $operator
+   * @param mixed $value
+   *
+   * @return QueryBuilder
+   */
+  final protected function whereAny(QueryBuilder $queryBuilder, array $columns = [], string $operator = "like", $value = "%.*%"): QueryBuilder {  
+    return !empty($columns) ? $queryBuilder->whereAny($columns, $operator, $value) : $queryBuilder;
+  }
+
+  /**
+   *
+   * @param QueryBuilder $queryBuilder
+   * @param Closure|null $whereClausesCallback
    *
    * @return QueryBuilder
    */
@@ -202,6 +246,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
    *
+   * @param QueryBuilder $queryBuilder
+   * @param Closure|null $whereClausesCallback
+   *
    * @return QueryBuilder
    */
   final protected function addOrWhereClauses(QueryBuilder $queryBuilder, Closure $whereClausesCallback = null): QueryBuilder {
@@ -209,6 +256,9 @@ abstract class SQLDatabaseTableRepository {
   }
 
   /**
+   *
+   * @param QueryBuilder $queryBuilder
+   * @param array $whereClauseDetails
    *
    * @return QueryBuilder
    */
@@ -222,38 +272,42 @@ abstract class SQLDatabaseTableRepository {
   }
 
   /**
-    * @param QueryBuilder $queryBuilder
-    *
-    * @throws Exception
-    */
+   *
+   * @param QueryBuilder $queryBuilder
+   *
+   * @throws Exception
+   */
   final protected function withRelation (QueryBuilder $queryBuilder): QueryBuilder {
     // @TODO: ...
   }
 
   /**
-    * @param QueryBuilder $queryBuilder
-    * @return EloquentQueryBuilderTask
-    * @throws Exception
-    */
+   *
+   * @param QueryBuilder $queryBuilder
+   * @throws Exception
+   *
+   * @return EloquentQueryBuilderTask
+   */
   final protected function  executeGetOnQuery (QueryBuilder $queryBuilder): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask($queryBuilder, 'get');
   }
 
   /**
-    * @param QueryBuilder $queryBuilder
-    *
-    * @return EloquentQueryBuilderTask
-    * @throws Exception
-    */
+   *
+   * @param QueryBuilder $queryBuilder
+   * @throws Exception
+   *
+   * @return EloquentQueryBuilderTask
+   */
   final protected function executeExiststOnQuery (QueryBuilder $queryBuilder): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask($queryBuilder, 'exists');
   }
 
   /**
     * @param QueryBuilder $queryBuilder
+    * @throws Exception
     *
     * @return EloquentQueryBuilderTask
-    * @throws Exception
     */
   final protected function executeDoesntExistOnQuery (QueryBuilder $queryBuilder): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask($queryBuilder, 'doesntExist');
@@ -261,9 +315,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
     * @param QueryBuilder $queryBuilder
+    * @throws Exception
     *
     * @return EloquentQueryBuilderTask
-    * @throws Exception
     */
   final protected function  executeCountOnQuery (QueryBuilder $queryBuilder): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask($queryBuilder, 'count');
@@ -271,9 +325,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
     * @param QueryBuilder $queryBuilder
+    * @throws Exception
     *
     * @return EloquentQueryBuilderTask
-    * @throws Exception
     */
   final protected function executeFirstOnQuery (QueryBuilder $queryBuilder): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask(
@@ -285,9 +339,9 @@ abstract class SQLDatabaseTableRepository {
   /**
    * @param QueryBuilder $queryBuilder
    * @param mixed[] $arguments
+   * @throws Exception
    *
    * @return EloquentQueryBuilderTask
-   * @throws Exception
    */
   protected final function executeUpdateOnQuery (QueryBuilder $queryBuilder, $arguments = []): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask(
@@ -300,9 +354,9 @@ abstract class SQLDatabaseTableRepository {
   /**
    * @param QueryBuilder $queryBuilder
    * @param mixed[] $arguments
+   * @throws Exception
    *
    * @return QueryBuilderTask
-   * @throws Exception
    */
   protected final function executeInsertOnQuery (QueryBuilder $queryBuilder, $arguments = []): EloquentQueryBuilderTask {
     return $this->executor->recordExecutorBuilderTask(
@@ -315,8 +369,9 @@ abstract class SQLDatabaseTableRepository {
   /**
     * @param string[] $columnsToFetch
     * @param Closure|null $whereClausesCallback
-    * @return EloquentQueryBuilderTask
     * @throws Exception
+    *
+    * @return EloquentQueryBuilderTask
     */
   public final function fetchAllWhereCallback(array $columnsToFetch = ["*"], Closure|null $whereClausesCallback = null): EloquentQueryBuilderTask {
     $queryBuilder = $this->getQueryBuilder();
@@ -333,16 +388,16 @@ abstract class SQLDatabaseTableRepository {
   /**
     * @param array $rowsToUpdate
     * @param Closure|null $whereClausesCallback
+    * @throws Exception
     *
     * @return EloquentQueryBuilderTask
-    * @throws Exception
     */
   public final function modify(array $rowsToUpdate = [], Closure|null $whereClausesCallback = null): EloquentQueryBuilderTask {
     $queryBuilder = $this->getQueryBuilder();
     $addWhereClauses = [$this, 'addWhereClauses'];
 
     if (empty($rowsToUpdate)) {
-      throw new Exception("Cannot proceed: No rows to update found");
+      throw new Exception("Cannot proceed with sql query; No rows to update found");
     }
 
     $modifiedQueryBuilder = $addWhereClauses($queryBuilder, $whereClausesCallback);
@@ -354,9 +409,11 @@ abstract class SQLDatabaseTableRepository {
   }
 
   /**
-    * @return EloquentQueryBuilderTask
-    * @throws Exception
-    */
+   *
+   * @throws Exception
+   *
+   * @return EloquentQueryBuilderTask
+   */
   public final function fetchFirst(): EloquentQueryBuilderTask {
     $queryBuilder = $this->getQueryBuilder();
 
@@ -366,8 +423,10 @@ abstract class SQLDatabaseTableRepository {
   }
 
   /**
-   * @return mixed
+   *
    * @throws Exception
+   *
+   * @return mixed
    */
   protected final function executeAllAndReturnResults () {
     return $this->executor->extractExecutorResults();
@@ -375,8 +434,9 @@ abstract class SQLDatabaseTableRepository {
 
   /**
     * @param Closure|null $whereClausesCallback
-    * @return EloquentQueryBuilderTask
     * @throws Exception
+    *
+    * @return EloquentQueryBuilderTask
     */
   public final function addWhereCallback(Closure|null $whereClausesCallback = null): EloquentQueryBuilderTask {
     $queryBuilder = $this->getQueryBuilder();
