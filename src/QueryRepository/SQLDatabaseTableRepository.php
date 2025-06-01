@@ -59,6 +59,18 @@ final class FluentSQLQueryBuilderExecutor {
     return $queryBuilderTask;
   }
 
+  public function getLastExecutedSQLQueryAsString (): string {
+    $lastElementKey = end(array_keys($this->queryBuilderTask));
+    while ($lastElementKey > 0) {
+      $lastQueryBuilderTask = $this->queryBuilderTasks[$lastElementKey];
+      if ($lastQueryBuilderTask->isExecuted()) {
+        return $lastQueryBuilderTask->getQueryBuilderSqlString();
+      }
+      --$lastElementKey;
+    }
+    return "";
+  }
+
   /**
    * @throws Exception
    * @return array
@@ -83,6 +95,7 @@ final class FluentSQLQueryBuilderExecutor {
           );
         }
       }
+      $context->queryBuilderTasks = [];
       return $executorResults;
     });
   }
@@ -119,9 +132,9 @@ abstract class SQLDatabaseTableRepository {
    *
    * @param QueryBuilder $queryBuilder
    * @return string
-   */public function __destruct () {
+   */
   protected function getLastExecutedSQLQueryAsString (): string {
-    
+    return $this->executor->getLastExecutedSQLQueryAsString();
   }
 
   /**
