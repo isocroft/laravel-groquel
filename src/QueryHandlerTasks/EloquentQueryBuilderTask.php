@@ -50,18 +50,32 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $this->executed = FALSE;
   }
 
+  /**
+   * @return string
+   */
   public function getQueryBuilderSqlString (): string {
     return Str::replaceArray('?', $this->queryBuilder->getBindings(), $this->queryBuilder->toSql());
   }
 
+  /**
+   * @param string $newQueryTaskName
+   * @return void
+   */
   public function setQueryTaskName (string $newQueryTaskName): void {
     $this->queryTaskName = $newQueryTaskName;
   }
 
+  /**
+   * @return string
+   */
   public function getQueryTaskName (): string {
     return $this->queryTaskName;
   }
 
+  /**
+   * @param array $newCallbackArguments
+   * @return void
+   */
   public function setCallbackArguments (array $newCallbackArguments): void {
     $this->callbackArguments = $newCallbackArguments;
   }
@@ -96,7 +110,10 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $result = NULL;
 
     if (is_callable($this->queryBuilder)) {
-      $result = ($this->queryBuilder)($this->callbackArguments);
+      $result = call_user_func_array(
+        $this->queryBuilder,
+        $this->callbackArguments
+      );
     }
 
     if ($result !== NULL) {
