@@ -10,9 +10,14 @@ use use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 final class StorageQueryTaskHandlersManager {
 
   /**
-    * @var StorageQueryTaskHandler $rootTaskHandler
-    */
+   * @var StorageQueryTaskHandler $rootTaskHandler
+   */
   private $rootTaskHandler;
+
+  /**
+   * @var int $handlersCount
+   */
+  private $handlersCount;
 
   /**
     * @param StorageQueryTaskHandler[] $storageQueryHandlers
@@ -25,12 +30,16 @@ final class StorageQueryTaskHandlersManager {
       throw new Exception("Cannot proceed: No storage query task handlers found");
     }
 
+    $this->handlersCount = $totalCount;
+
     for ($count = 0; $count + 1 < $totalCount; $count++) {
       $previousQueryTaskHandler = $storageQueryHandlers[$count];
       $nextQueryTaskHandler = $storageQueryHandlers[$count + 1];
 
       if ($previousQueryTaskHandler instanceof StorageQueryTaskHandler) {
-        $previousQueryTaskHandler->setNextHandler($nextQueryTaskHandler);
+        if ($nextQueryTaskHandler instanceof StorageQueryTaskHandler) {
+          $previousQueryTaskHandler->setNextHandler($nextQueryTaskHandler);
+        }
       }
     }
 
