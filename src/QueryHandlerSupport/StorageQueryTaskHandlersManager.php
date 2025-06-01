@@ -2,8 +2,10 @@
 
 namespace Groquel\Laravel\QueryHandlerSupport;
 
+use Exception;
+
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
-use use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
+use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 /* @HINT: This is a storage query task manger for all data access an storage needs of a data repository. */
 
@@ -15,11 +17,6 @@ final class StorageQueryTaskHandlersManager {
   private $rootTaskHandler;
 
   /**
-   * @var int $handlersCount
-   */
-  private $handlersCount;
-
-  /**
     * @param StorageQueryTaskHandler[] $storageQueryHandlers
     * @throws Exception
     */
@@ -27,10 +24,8 @@ final class StorageQueryTaskHandlersManager {
     $totalCount = count($storageQueryHandlers);
 
     if ($totalCount === 0) {
-      throw new Exception("Cannot proceed: No storage query task handlers found");
+      throw new Exception("Cannot proceed with manager action; No storage query task handlers found");
     }
-
-    $this->handlersCount = $totalCount;
 
     for ($count = 0; $count + 1 < $totalCount; $count++) {
       $previousQueryTaskHandler = $storageQueryHandlers[$count];
@@ -39,21 +34,30 @@ final class StorageQueryTaskHandlersManager {
       if ($previousQueryTaskHandler instanceof StorageQueryTaskHandler) {
         if ($nextQueryTaskHandler instanceof StorageQueryTaskHandler) {
           $previousQueryTaskHandler->setNextHandler($nextQueryTaskHandler);
+        } else {
+          throw new Exception("Cannot proceed with manager action; list of storage query task handlers doesn't contain a valid instance");
         }
+      } else {
+        throw new Exception("Cannot proceed with manager action; list of storage query task handlers doesn't contain a valid instance");
       }
     }
 
     $this->rootTaskHandler = $storageQueryHandlers[0];
   }
 
+  /**
+   * @result void
+   */
   public function __destruct() {
+    $this->rootTaskHandler->unsetNextHandler();
     $this->rootTaskHandler = NULL;
   }
 
   /**
     * @param StorageQueryTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   public function execute(StorageQueryTask $queryTask) {
     return $this->rootTaskHandler->handle($queryTask);
@@ -62,6 +66,8 @@ final class StorageQueryTaskHandlersManager {
   /**
     * @param StorageQueryTaskHandler $newRootTaskHandler
     * @throws Exception
+    *
+    * @return void
     */
   public function swapRootHandler(StorageQueryTaskHandler $newRootTaskHandler) {
     $formerRootTaskHandler = &$this->rootTaskHandler;
