@@ -13,7 +13,6 @@ use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerSupport\StorageQueryTaskHandlersManager;
 
 use lluminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Str;
 
 final class FluentSQLQueryBuilderExecutor {
   /**
@@ -62,6 +61,7 @@ final class FluentSQLQueryBuilderExecutor {
 
   /**
    * @throws Exception
+   * @return array
    */
   public function extractExecutorResults () {
     $context = &$this;
@@ -119,9 +119,9 @@ abstract class SQLDatabaseTableRepository {
    *
    * @param QueryBuilder $queryBuilder
    * @return string
-   */
-  protected function get(QueryBuilder $queryBuilder): string {
-    return Str::replaceArray('?', $queryBuilder->getBindings(), $queryBuilder->toSql());
+   */public function __destruct () {
+  protected function getLastExecutedSQLQueryAsString (): string {
+    
   }
 
   /**
@@ -131,10 +131,10 @@ abstract class SQLDatabaseTableRepository {
     */
   public function getTableName(): string {
     if (is_null($this->dataModel)) {
-      throw new Exception("");
+      throw new Exception("Model instance for repository: '".get_called_class()."' is null");
     }
 
-    return $this->dataModel->getTale();
+    return $this->dataModel->getTable();
   }
 
   /**
@@ -144,7 +144,7 @@ abstract class SQLDatabaseTableRepository {
     */
   protected function getQueryBuilder(): QueryBuilder {
     if (is_null($this->dataModel)) {
-      throw new Exception("");
+      throw new Exception("Model instance for repository: '".get_called_class()."' is null");
     }
 
     $brandNewModelInstance = $this->dataModel->newInstance();
