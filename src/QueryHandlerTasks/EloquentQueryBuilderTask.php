@@ -36,12 +36,18 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
    */
   private $queryTaskName;
 
+  /**
+   * @var boolean $executed
+   */
+  private $executed;
+
   public function __construct (QueryBuilder|Clousre $queryBuilder, string $nameOfMethodToCall = "", array $methodArguments = []) {
     $this->queryBuilder = $queryBuilder;
     $this->trigger = $nameOfMethodToCall;
     $this->methodArguments = $methodArguments;
     $this->callbackArguments = [];
     $this->queryTaskName = "";
+    $this->executed = FALSE;
   }
 
   public function getQueryBuilderSqlString (): string {
@@ -72,7 +78,17 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     return "";
   }
 
-  public function getQueryTaskResult () {
+  /**
+   * @return boolean
+   */
+  public function isExecuted (): boolean {
+    return $this->executed;
+  }
+
+  /**
+   * @return array
+   */
+  public function getQueryTaskResult (): array {
     $trigger = $this->trigger;
     $canCallTrigger = $trigger !== "";
 
@@ -83,6 +99,7 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     }
 
     if (is_array($queryBuilder)) {
+      $this->executed = TRUE;
       return $queryBuilder;
     }
 
@@ -90,15 +107,19 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
       && method_exists($queryBuilder, $trigger)
         && method_exists($queryBuilder 'toSql')) {
       if (count($this->methodArguments) === 0) {
+        $this->executed = TRUE;
         return $queryBuilder->{$trigger}();
       } else {
+        $this->executed = TRUE;
         return call_user_func_array(
           array($queryBuilder, $trigger),
           $this->methodArguments
         );
       }
     }
-    return $queryBuilder;
+
+    $this->executed = TRUE;
+    return []; //return $queryBuilder;
   }
 }
 
