@@ -3,7 +3,7 @@
 namespace Groquel\Laravel\QueryRepository;
 
 use Closure;
-use Exception;
+use \Exception as Exception;
 
 use Illuminate\Database\Eloquent\Model as RootModel;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
@@ -28,7 +28,7 @@ final class FluentSQLQueryBuilderExecutor {
   /**
    * @param StorageQueryTaskHandlersManager $queryManager
    */
-  public function __construct (StorageQueryTaskHandlersManager $queryManager) {
+  public function __construct(StorageQueryTaskHandlersManager $queryManager) {
     $this->queryBuilderTasks = [];
     $this->queryManager = $queryManager;
   }
@@ -36,7 +36,7 @@ final class FluentSQLQueryBuilderExecutor {
   /**
    * @return void
    */
-  public function __destruct () {
+  public function __destruct() {
     $this->queryBuilderTasks = NULL;
     $this->queryManager = NULL;
   }
@@ -47,6 +47,7 @@ final class FluentSQLQueryBuilderExecutor {
    * @return void
    */
   public function setNewRootHandler(StorageQueryTaskHandler $newRootHandler): void {
+    $this->queryBuilderTasks = [];
     $this->queryManager->swapRootHandler($newRootHandler);
   }
 
@@ -95,6 +96,10 @@ final class FluentSQLQueryBuilderExecutor {
     $result = DB::transaction(function () use ($context) {
       $executorResults = array();
       foreach ($context->queryBuilderTasks as $queryBuilderTask) {
+        if ($queryBuilderTask->isExecuted()) {
+          continue;
+        }
+
         if (count($executorResults) > 0) {
           $queryBuilderTask->setCallbackArguments($executorResults);
         }
@@ -110,7 +115,7 @@ final class FluentSQLQueryBuilderExecutor {
           );
         }
       }
-      $context->queryBuilderTasks = [];
+
       return $executorResults;
     });
   }
@@ -133,7 +138,7 @@ abstract class SQLDatabaseTableRepository {
    * @param StorageQueryTaskHandler[] $storageQueryHandlers
    * @throws Exception
    */
-  public function __construct (array $storageQueryHandlers = [], RootModel $dataModel = null) {
+  public function __construct(array $storageQueryHandlers = [], RootModel $dataModel = null) {
     $queryManager = new StorageQueryHandlersManager($storageQueryHandlers);
     $this->executor = new FluentSQLQueryBuilderExecutor($queryManager);
     $this->dataModel = $dataModel;
@@ -142,7 +147,7 @@ abstract class SQLDatabaseTableRepository {
   /**
    * @return  void
    */
-  public function __destruct () {
+  public function __destruct() {
     $this->executor = NULL;
     $this->dataModel = NULL;
   }
@@ -151,7 +156,7 @@ abstract class SQLDatabaseTableRepository {
    *
    * @return string
    */
-  protected function getLastExecutedSQLQueryAsString (): string {
+  final protected function getLastExecutedSQLQueryAsString(): string {
     return $this->executor->getLastExecutedSQLQueryAsString();
   }
 
