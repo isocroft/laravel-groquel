@@ -24,7 +24,7 @@ abstract class GroquelServiceProvider extends ServiceProvider
             "cache: error message to skip processing"
           );
         });
-        $this->app->bind('queryhandlerlist', function (Container $app) {
+        $this->app->singleton('QueryHandlersList', function (Container $app) {
           return [$app->make(CacheQueryTaskHandler::class), $app->make(DatabaseQueryTaskHandler::class)];
         });
     }
