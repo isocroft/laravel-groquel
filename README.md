@@ -14,7 +14,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 final class UserTableRepository extends SQLDatabaseTableRepository {
 
-  public final getAllActiveUsers () {
+  public function getAllActiveUsers () {
     $context = &$this;
     $queryOneBuilder = User::where(function (Builder $query) {
       $query->whereNot('status', '=', 'suspended');
