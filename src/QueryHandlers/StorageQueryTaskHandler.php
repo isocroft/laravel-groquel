@@ -20,30 +20,33 @@ abstract class StorageQueryTaskHandler {
   private $nextHandler;
 
   /**
-    * @param string $skipHandlerErrorMessage
-    */
+   * @param string $skipHandlerErrorMessage
+   */
   public function __construct(string $skipHandlerErrorMessage = "") {
     $this->message = $skipHandlerErrorMessage;
     $this->nextHandler = NULL;
   }
 
+  /**
+   * @return void
+   */
   public function __destruct() {
     $this->unsetNextHandler();
-    $this->message = "";
+    $this->message = NULL;
   }
 
   /**
-    * @param StorageQueryTaskHandler $handler
-    * @return void
-    */
-  public final function setNextHandler(StorageQueryTaskHandler $handler): void {
+   * @param StorageQueryTaskHandler $handler
+   * @return void
+   */
+  final public function setNextHandler(StorageQueryTaskHandler $handler): void {
     $this->nextHandler = $handler;
   }
 
   /**
    * @return void
    */
-  public final function unsetNextHandler(): void {
+  final public function unsetNextHandler(): void {
     if ($this->nextHandler !== NULL) {
       $this->nextHandler->unsetNextHandler();
       $this->nextHandler = NULL;
@@ -84,12 +87,12 @@ abstract class StorageQueryTaskHandler {
   protected abstract function alternateProcessing(StorageQueryTask $queryTask);
 
   /**
-    * @param Exception|null $error
-    * @throws Exception
-    *
-    * @return void
-    */
-  public final function skipHandlerProcessing(Exception $error = null): void {
+   * @param Exception|null $error
+   * @throws Exception
+   *
+   * @return void
+   */
+  final public function skipHandlerProcessing(Exception $error = null): void {
     if ($this->nextHandler === NULL) {
       if ($error !== NULL) {
         throw $error;
@@ -101,29 +104,29 @@ abstract class StorageQueryTaskHandler {
   }
 
   /**
-    * @param string $message
-    * @throws Exception
-    */
+   * @param string $message
+   * @throws Exception
+   */
   public function skipHandlerProcessingWithCustomMessage(string $message): void {
     throw new Exception($message);
   }
 
   /**
-    * @param StorageQueryTask $queryTask
-    * @throws Exception
-    *
-    * @return StorageQueryTask
-    */
+   * @param StorageQueryTask $queryTask
+   * @throws Exception
+   *
+   * @return StorageQueryTask
+   */
   protected function migrateQueryTask(StorageQueryTask $queryTask): StorageQueryTask {
     return $queryTask;
   }
 
   /**
-    * @param StorageQueryTask $queryTask
-    * @return mixed
-    * @throws Exception
-    */
-  public final function handle(StorageQueryTask $queryTask) {
+   * @param StorageQueryTask $queryTask
+   * @return mixed
+   * @throws Exception
+   */
+  final public function handle(StorageQueryTask $queryTask) {
     $result = null;
     $processingError = null;
     $noResult = true;
@@ -132,7 +135,11 @@ abstract class StorageQueryTaskHandler {
     /* @HINT:
     
         Using the template method pattern to ensure each handler 
-        doesn't forget to call the next handler.
+        > doesn't forget to call the next handler.
+        
+        Remember that the manager for the storage query task handler
+        > sets up each handler to have a reference to the next handler
+        > in the chain of handlers.
     */
     try {
       try {
@@ -142,6 +149,11 @@ abstract class StorageQueryTaskHandler {
         $noResult = false;
         return $result;
       } catch (Exception $error) {
+        /* @HINT:
+
+           If `->skipHandlerProcessing(..)` is called,
+           > then call the next handler in the chain.
+        */
         if ($error->getMessage() === $this->message
           && $this->nextHandler !== null) {
             $result = $this->nextHandler->handle($queryTask);
@@ -165,7 +177,11 @@ abstract class StorageQueryTaskHandler {
           );
           if ($noResult
             && $processingError->getMessage() === $this->message) {
-            /* @HINT: If there's no result and we have an error, try to get a result from an alternate process */
+            /* @HINT:
+               
+               If there's no result and we have an error, try to 
+               > get a result from an alternate process
+            */
             $result = $this->alternateProcessing(
               $this->migrateQueryTask($queryTask)
             );
