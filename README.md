@@ -60,7 +60,7 @@ class AllRepositoriesServiceProvider extends GroquelServiceProvider {
     parent::register();
 
     $this->app->singleton(UserTableRepository::class, function (/*Application*/$app) {
-      return new UserTableRepository($app['QueryHandlersList'], $app->make('App\Models\User');
+      return new UserTableRepository($app['QueryHandlersList'], $app->make('App\Models\User'));
     });
   }
 }
