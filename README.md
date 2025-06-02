@@ -27,7 +27,7 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
 
     $this->executeGetOnQuery(
       function (array $arguments) use ($context) {
-        $innerQueryBuilder = $context->getQueryBuilder()
+        $innerQueryBuilder = $context->getQueryBuilder();
 
         return $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status');
       }
