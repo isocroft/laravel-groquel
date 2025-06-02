@@ -48,7 +48,6 @@ Create custom service provider using the data repository created above
 
 namespace App\Providers;
  
-use App\Services\Riak\Connection;
 //use Illuminate\Contracts\Foundation\Application;
 use Groquel\Laravel\GroquelServiceProvider;
 
