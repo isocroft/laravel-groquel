@@ -123,8 +123,9 @@ abstract class StorageQueryTaskHandler {
 
   /**
    * @param StorageQueryTask $queryTask
-   * @return mixed
    * @throws Exception
+   *
+   * @return mixed
    */
   final public function handle(StorageQueryTask $queryTask) {
     $result = null;
@@ -135,13 +136,15 @@ abstract class StorageQueryTaskHandler {
     /* @HINT:
     
         Using the template method pattern to ensure each handler 
-        > doesn't forget to call the next handler.
-        
-        Remember that the manager for the storage query task handler
-        > sets up each handler to have a reference to the next handler
-        > in the chain of handlers.
+        > doesn't forget to call the next handler in the chain.
     */
     try {
+      /* @NOTE:
+      
+         that the manager for the storage query task handler
+        > sets up each handler to have a reference to the next handler
+        > in the chain of handlers.
+      */
       try {
         $result = $this->beginProcessing(
           $this->migrateQueryTask($queryTask)
@@ -191,6 +194,7 @@ abstract class StorageQueryTaskHandler {
         }
       }
     } catch (Exception $error) {
+      /* @TODO [Debug Logs]: log error here in debug/test mode */
       throw $error;
     }
 
