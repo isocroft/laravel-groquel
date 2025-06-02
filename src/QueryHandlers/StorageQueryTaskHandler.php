@@ -10,10 +10,13 @@ use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 
 abstract class StorageQueryTaskHandler {
   /**
-    * @var string $message
-    * @var StorageQueryTaskHandler|null $nextHandler
-    */
+   * @var string $message
+   */
   private $message;
+
+  /**
+   * @var StorageQueryTaskHandler|null $nextHandler
+   */
   private $nextHandler;
 
   /**
