@@ -3,33 +3,59 @@ namespace Groquel\Laravel\QueryHandlers;
 
 use \Exception as Exception;
 
-use Groquel\Laravel\QueryHandlers\StorageQueryTaskHanddler;
+use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
-final class DatabaseQueryTaskHandler extends StorageQueryTaskHanddler {
+use Illuminate\Support\Facades\DB;
+
+final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
   /**
-    * @param EloquentQueryBuilderTask $queryTask
-    * @return mixed
-    * @throws Exception
-    */
+   * @var PDO $pdo
+   */
+  private $pdo;
+
+  /**
+   * @param string $skipHandlerErrorMessage
+   */
+  public function __construct(string $skipHandlerErrorMessage = "") {
+    parent::__construct($skipHandlerErrorMessage);
+    $this->pdo = DB::connection()->getPdo();
+  }
+
+  /**
+   * @return void
+   */
+  public function __destruct() {
+    parent::__destruct();
+    $this->pdo = NULL;
+  }
+  /**
+   * @param EloquentQueryBuilderTask $queryTask
+   * @throws Exception
+   *
+   * @return mixed
+   */
   protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
     return $queryTask->getQueryTaskResult();
   }
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
-  protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask, $result): void {
-      
+  protected function finalizeProcessing(EloquentQueryBuilderTask $queryTask): void {
+    $queryTask->setAsCompletelyExecuted();
+    //$this->pdo->exec('USE another_db');
   }
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
     * @param Exception $error
-    * @return void
     * @throws Exception
+    *
+    * @return void
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
     $queryName = $queryTask->getQueryTaskName();
@@ -38,8 +64,9 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHanddler {
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
-    * @return mixed
     * @throws Exception
+    *
+    * @return mixed
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
