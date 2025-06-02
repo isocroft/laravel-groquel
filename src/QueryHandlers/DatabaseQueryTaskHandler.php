@@ -10,16 +10,17 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
   /**
-   * @var PDO $pdo
+   * @var PDO|null $pdo
    */
   private $pdo;
 
   /**
    * @param string $skipHandlerErrorMessage
+   * @param PDO|null $pdoInstance
    */
-  public function __construct(string $skipHandlerErrorMessage = "") {
+  public function __construct(string $skipHandlerErrorMessage, $pdoInstance = null) {
     parent::__construct($skipHandlerErrorMessage);
-    $this->pdo = DB::connection()->getPdo();
+    $this->pdo = is_null($pdoInstance) ? DB::connection()->getPdo() : $pdoInstance;
   }
 
   /**
