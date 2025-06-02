@@ -58,8 +58,36 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
   /**
    * @return string
    */
+  public function getQueryBuilderTableName (): string {
+    if (!is_callable($this->queryBuilder)) {
+      if (method_exists($this->queryBuilder, 'getModel')) {
+        return $this->queryBuilder->getModel()->getTable();
+      }
+    }
+  }
+
+  /**
+   * @return string
+   */
+  public function getQueryBuilderConnectionName (): string {
+    if (!is_callable($this->queryBuilder)) {
+      if (method_exists($this->queryBuilder, 'getModel')) {
+        return $this->queryBuilder->getModel()->getConnectionName();
+      }
+    }
+    return "";
+  }
+
+  /**
+   * @return string
+   */
   public function getQueryBuilderSqlString (): string {
-    return Str::replaceArray('?', $this->queryBuilder->getBindings(), $this->queryBuilder->toSql());
+    if (!is_callable($this->queryBuilder)) {
+      if (method_exists($this->queryBuilder, 'toSql')) {
+        return Str::replaceArray('?', $this->queryBuilder->getBindings(), $this->queryBuilder->toSql());
+      }
+    }
+    return "";
   }
 
   /**
@@ -93,11 +121,21 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
       return $this->getQueryTaskName();
     }
 
-    if (method_exists($this->queryBuilder, 'toSql')) {
-      return strtolower($this->getQueryBuilderSqlString())."|".strtolower($this->queryBuilder->getModel()->getTable());
+    $sqlQueryString = $this->getQueryBuilderSqlString();
+    $tableName = $this->getQueryBuilderTableName();
+
+    if ($sqlQueryString !== "") {
+      return strtolower($sqlQueryString)."|".strtolower($tableName);
     }
 
     return "|";
+  }
+
+  /**
+   * @return void
+   */
+  public function setAsCompletelyExecuted (): void {
+    $this->executed = TRUE;
   }
 
   /**
@@ -125,7 +163,6 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     }
 
     if ($result !== NULL) {
-      $this->executed = TRUE;
       return $result;
     }
 
@@ -133,10 +170,8 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
       && method_exists($queryBuilder, $trigger)
         && method_exists($queryBuilder 'toSql')) {
       if (count($this->methodArguments) === 0) {
-        $this->executed = TRUE;
         $result = $queryBuilder->{$trigger}();
       } else {
-        $this->executed = TRUE;
         $result = call_user_func_array(
           array($queryBuilder, $trigger),
           $this->methodArguments
