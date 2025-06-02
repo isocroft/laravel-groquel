@@ -29,8 +29,7 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
       function (array $arguments) use ($context) {
         $innerQueryBuilder = $context->getQueryBuilder()
 
-        $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status')
-        return $innerQueryBuilder;
+        return $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status');
       }
     )->setQueryTaskName("step2|".$tableName);
 
