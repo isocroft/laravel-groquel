@@ -1,6 +1,6 @@
 {
   "name": "isocroft/laravel-groquel",
-  "description": "A system of handlers used to make data access from I/O sources more efficient for Laravel v10+ PHP apps",
+  "description": "A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and simple for Laravel v11+ PHP apps",
   "keywords": [
     "laravel",
     "handlers",
@@ -25,9 +25,9 @@
   "require": {
     "php": "^8.0",
     "composer-runtime-api": "^2.0.0",
-    "illuminate/container": "^10.0|^11",
-    "illuminate/database": "^10.30|^11",
-    "illuminate/support": "^10.0|^11",
+    "illuminate/container": "^11.0|^12",
+    "illuminate/database": "^11.0|^12",
+    "illuminate/support": "^11.0|^12",
   },
   "require-dev": {
     "phpunit/phpunit": "^11.5",
