@@ -1,6 +1,6 @@
 {
   "name": "isocroft/laravel-groquel",
-  "description": "A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and simple for Laravel v11+ PHP apps",
+  "description": "A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and fault-tolerant for Laravel v11+ PHP apps",
   "keywords": [
     "laravel",
     "handlers",
