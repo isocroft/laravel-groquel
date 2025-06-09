@@ -1,5 +1,5 @@
 # Laravel-Groquel
-A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and simple for Laravel v11+ PHP apps.
+A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and fault-tolerent for Laravel v11+ PHP apps.
 
 This package makes setting up caching of database queries much more easier and you can easily override parts you don't like and tune the storage query task handlers to your taste.
 
