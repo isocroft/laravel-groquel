@@ -3,6 +3,22 @@ A basic chain of handlers used to make access to any database via an Eloquent Mo
 
 This package makes setting up caching of database queries much more easier and you can easily override parts you don't like and tune the storage query task handlers to your taste.
 
+## How To / Setup
+
+Basically, this package abstracts the need for a cache or a set of caches and other data store types (e.g. PosgreSQL DB, MongoDB, Text File, REST API) into a  chain of handlers in a fault-tolerant way.
+
+- One handler for a cache (Redis - could be read-only)
+- One handler for the main database (PosgreSQL - could be write-only)
+- One handler for a REST API service (Paystack Bank API - could also be read-only / only GET requests)
+- One handler for a text file on disk (JSON text file for country names and country codes - could be read/write)
+- One handler for a custome materialized view database (MongoDB - read-only obviously)
+
+And all these handlers can be put into a chain (i.e. chain-of-responsibility) to process data access requests in the shape of DB queries or REST API requests all behind a single common data repository interface.
+
+Best of all you can use 2 cache handlers (one for DB queries and another one for REST API requests) in the same chain of handlers behind a single abstraction.
+
+Lastly, you can also swap handlers in and out of the chain of handlers at runtime.
+
 ## Usage
 
 Firstly, create an data repository for a specific eloquent moddel (in this case `App\Models\User`) to access data through the chain of handlers.
