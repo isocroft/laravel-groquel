@@ -7,8 +7,9 @@ use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
 use Illuminate\Support\Facades\Cache as QueryCache;
+use Illuminate\Support\Facades\Config as QueryConfig;
 
-final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
+final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
   /**
     * @param string $queryKey
     * @return boolean
@@ -76,7 +77,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHanddler {
 
     /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
     $queryHash = md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1);
-    $ttl = 2300;
+    $ttl = QueryConfig::get("groquel.handler.cache.ttl", 2300); // @HINT: integer value
     $isCacheMiss = !$this->canQuery($queryHash);
 
     if (isCacheMiss) {
