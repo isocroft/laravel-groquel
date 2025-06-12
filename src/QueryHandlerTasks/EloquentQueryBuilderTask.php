@@ -51,7 +51,7 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
     $this->trigger = $nameOfMethodToCall;
     $this->methodArguments = $methodArguments;
     $this->callbackArguments = [];
-    $this->queryTaskName = "";
+    $this->queryTaskName = "[anonymous]";
     $this->executed = FALSE;
   }
 
