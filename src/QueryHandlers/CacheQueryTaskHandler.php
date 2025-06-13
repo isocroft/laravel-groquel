@@ -3,6 +3,7 @@ namespace Groquel\Laravel\QueryHandlers;
 
 use \Exception as Exception;
 
+use Groquel\Laravel\QueryHandlers\Contracts\StorageQueryTask;
 use Groquel\Laravel\QueryHandlers\StorageQueryTaskHandler;
 use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
@@ -17,6 +18,21 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
   private function canQuery(string $queryKey): boolean {
     return QueryCache::has($queryKey);
   }
+
+  /**
+   * @param StorageQueryTask $queryTask
+   * @throws Exception
+   *
+   * @return StorageQueryTask
+   */
+  protected function migrateQueryTask(StorageQueryTask $queryTask): StorageQueryTask {
+    if ($queryTask instanceof EloquentQueryBuilderTask) {
+      return $queryTask;
+    }
+
+    return $this->skipHandlerProcessing();
+  }
+
   /**
     * @param EloquentQueryBuilderTask $queryTask
     * @throws Exception
