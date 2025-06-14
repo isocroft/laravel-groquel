@@ -50,9 +50,9 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
    * @param EloquentQueryBuilderTask $queryTask
    * @throws Exception
    *
-   * @return mixed
+   * @return string|array|object
    */
-  protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
+  protected function beginProcessing(EloquentQueryBuilderTask $queryTask): string|array|object {
     return $queryTask->getQueryTaskResult();
   }
 
@@ -83,7 +83,7 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     * @param EloquentQueryBuilderTask $queryTask
     * @throws Exception
     *
-    * @return mixed
+    * @return string|array|object
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
