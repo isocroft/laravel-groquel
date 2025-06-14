@@ -8,13 +8,28 @@ use Groquel\Laravel\QueryHandlers\DatabaseQueryTaskHandler;
 //use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
-abstract class GroquelServiceProvider extends ServiceProvider
-{
+abstract class GroquelServiceProvider extends ServiceProvider {
     /**
-     * Register the service provider.
+     * Perform post-registration booting of services.
+     *
+     * @return void
      */
-    public function register()
-    {
+    public function boot(): void {
+      $this->publishes([
+        __DIR__.'/../config/groquel.php' => config_path('groquel.php'),
+      ]);
+    }
+
+    /**
+     * Register groquel application services.
+     *
+     * @return void
+     */
+    public function register(): void {
+        $this->mergeConfigFrom(
+          __DIR__.'/../config/groquel.php', 'groquel'
+        );
+
         $this->app->bind(DatabaseQueryTaskHandler::class, function () {
           return new DatabaseQueryTaskHandler(
             "database: error message to skip processing"
@@ -25,6 +40,7 @@ abstract class GroquelServiceProvider extends ServiceProvider
             "cache: error message to skip processing"
           );
         });
+
         $this->app->singleton('QueryHandlersList', function (/*Application|Container*/$app) {
           return [$app->make(CacheQueryTaskHandler::class), $app->make(DatabaseQueryTaskHandler::class)];
         });
