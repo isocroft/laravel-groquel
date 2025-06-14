@@ -57,9 +57,9 @@ abstract class StorageQueryTaskHandler {
     * @param StorageQueryTask $queryTask
     * @throws Exception
     *
-    * @return mixed
+    * @return string|array|object
     */
-  protected abstract function beginProcessing(StorageQueryTask $queryTask);
+  protected abstract function beginProcessing(StorageQueryTask $queryTask): string|array|object;
 
   /**
     * @param StorageQueryTask $queryTask
@@ -82,9 +82,9 @@ abstract class StorageQueryTaskHandler {
     * @param StorageQueryTask $queryTask
     * @throws Exception
     *
-    * @return mixed
+    * @return string|array|object
     */
-  protected abstract function alternateProcessing(StorageQueryTask $queryTask);
+  protected abstract function alternateProcessing(StorageQueryTask $queryTask): string|array|object;
 
   /**
    * @param Exception|null $error
@@ -170,7 +170,7 @@ abstract class StorageQueryTaskHandler {
       } finally {
         if (!$hasError) {
           $this->finalizeProcessing(
-            $this->migrateQueryTask($queryTask),
+            $queryTask,
             $result
           );
         } else {
@@ -178,15 +178,17 @@ abstract class StorageQueryTaskHandler {
             $queryTask,
             $processingError
           );
+
           if ($noResult
             && $processingError->getMessage() === $this->message) {
+            $processingError = null;
             /* @HINT:
                
                If there's no result and we have an error, try to 
                > get a result from an alternate process
             */
             $result = $this->alternateProcessing(
-              $this->migrateQueryTask($queryTask)
+              $queryTask
             );
             $noResult = false;
             return $result;
@@ -194,8 +196,16 @@ abstract class StorageQueryTaskHandler {
         }
       }
     } catch (Exception $error) {
-      /* @TODO [Debug Logs]: log error here in debug/test mode */
-      throw $error;
+      if ($hasError && !$noResult && is_null($processingError)) {
+        $hasError = false;
+        $this->finalizeProcessing(
+          $queryTask,
+          $result
+        );
+      } else {
+        /* @TODO [Debug Logs]: log error here in debug/test mode */
+        throw $error;
+      }
     }
 
     return $result;
