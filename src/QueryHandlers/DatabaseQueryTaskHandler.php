@@ -43,7 +43,7 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
       return $queryTask;
     }
 
-    return $this->skipHandlerProcessing();
+    $this->skipHandlerProcessing();
   }
  
   /**
