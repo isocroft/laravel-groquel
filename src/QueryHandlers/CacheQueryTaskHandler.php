@@ -30,16 +30,16 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
       return $queryTask;
     }
 
-    return $this->skipHandlerProcessing();
+    $this->skipHandlerProcessing();
   }
 
   /**
     * @param EloquentQueryBuilderTask $queryTask
     * @throws Exception
     *
-    * @return mixed
+    * @return string|array|object
     */
-  protected function beginProcessing(EloquentQueryBuilderTask $queryTask) {
+  protected function beginProcessing(EloquentQueryBuilderTask $queryTask): string|array|object {
     $canProceedWithProcessing = false;
     $isSQLDatabaseQueryTask = false;
 
@@ -53,7 +53,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     }
 
     if (!canProceedWithProcessing or !$isSQLDatabaseQueryTask) {
-      return $this->skipHandlerProcessing();
+      $this->skipHandlerProcessing();
+      return [];
     }
 
     /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
@@ -64,7 +65,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
       return QueryCache::get($queryHash);
     }
 
-    return $this->skipHandlerProcessing();
+    $this->skipHandlerProcessing();
   }
 
   /**
@@ -117,7 +118,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     * @param EloquentQueryBuilderTask $queryTask
     * @throws Exception
     *
-    * @return mixed
+    * @return string|array|object
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
     $queryName = $queryTask->getQueryTaskName();
