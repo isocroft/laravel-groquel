@@ -21,9 +21,11 @@ Lastly, you can also swap handlers in and out of the chain of handlers at runtim
 
 ## Usage
 
-So, instead of doing this (which is simpler and seems to be less hassle and the right amount of code for the job):
+So, instead of doing this (which, on the surface, looks simpler and seems to be less hassle and the right amount of code for setting up caching):
 
 ```php
+
+namespace App\Services\Database;
 
 use Illuminate\Supports\Facade\Cache;
 
@@ -43,7 +45,7 @@ final class CacheService {
     return $builder->getModel()->newInstance([]);
   }
 
-  public function queryOperation(string $key, int $timeInMinutes, QueryBuilder $builder): Collection {
+  public function queryOperation (string $key, int $timeInMinutes, QueryBuilder $builder): Collection {
     $cacheData = NULL;
     /* @HINT: Combining the Write-around & Cache-aside strategies for the cache */
     if (Cache::has($key)) {
@@ -57,7 +59,7 @@ final class CacheService {
     return $cacheData;
   }
 
-  public function invalidateOperation(string $key): bool {
+  public function invalidateOperation (string $key): bool {
     if (Cache::has($key)) {
       Cache::delete($key);
       return true;
@@ -70,14 +72,15 @@ final class CacheService {
 
 The code above is a good start because you can pass in a query builder instance for any eloquent model and also presents a generic interface that can be easily adapted to sepcific situations where the cache service would be needed. However, the issue with the code above is that you have to manually call the methods at the right time and place inside your controller (instead of leveraging inversion-of-control). Additionally, there's the issue of a lack of robust error handling too and in the future if we need to extend the functionality here, it can take longer to implement without bugs.
 
-Alternatively, a data repository can be created for a specific eloquent moddel (in this case `App\Models\User`) (or any eloquent model for that matter) to access data through the chain of handlers (while leveraging inversion-of-control and robust  error-handling).
+Alternatively, a data repository can be created for a specific eloquent model (in this case `App\Models\User`) (or any eloquent model for that matter) to access data through the chain of handlers (while leveraging inversion-of-control and robust  error-handling).
 
 ```php
 <?php
 
+namespace App\Services\Database;
+
 use App\Models\User;
 use Groquel\Laravel\QueryRepository\SQLDatabaseTableRepository;
-//use lluminate\Support\Facades\DB;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
