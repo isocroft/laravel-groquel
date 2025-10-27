@@ -1,19 +1,19 @@
 # Laravel-Groquel
-A basic chain of handlers used to make access to any database via an Eloquent Model repository more efficient and fault-tolerant for Laravel v11+ PHP apps.
+A simple chain of query-handlers which ensures access to any data source (e.g. database, cache, REST API endpoint) is easy, efficient and fault-tolerant for Laravel v11+ PHP apps
 
-This package makes setting up caching of database queries much more easier and you can easily override parts you don't like and tune the storage query task handlers to your taste.
+This package makes setting up caching of database queries a breeze using a chain of query handler classes. It can also easily be customized to override/swap out query-handlers you don't like while customizing the query-handlers functions (or storage query task handlers) to your taste.
 
 ## How To / Setup
 
-Basically, this package abstracts the need for a cache or a set of caches and other data store types (e.g. PosgreSQL DB, MongoDB, Text File, REST API) into a  chain of handlers in a fault-tolerant way.
+Basically, this package abstracts the need for a cache or a set of ata sources (e.g. PosgreSQL DB, MongoDB, Redis, a JSON file on disk, REST API) into a chain of query-handlers in a fault-tolerant way.
 
 - One handler for a cache (Redis - could be read-only)
-- One handler for the main database (PosgreSQL - could be write-only)
+- One handler for the main database (PosgreSQL - could be write-only or read-write)
 - One handler for a REST API service (Paystack Bank API - could also be read-only / only GET requests)
 - One handler for a text file on disk (JSON text file for country names and country codes - could be read/write)
 - One handler for a custome materialized view database (MongoDB - read-only obviously)
 
-And all these handlers can be put into a chain (i.e. chain-of-responsibility) to process data access requests in the shape of DB queries or REST API requests all behind a single common data repository interface.
+And all these query-handlers can be put into a chain (i.e. using the chain-of-responsibility pattern) to process data query/mutation requests in the shape of DB queries or REST API requests all behind a single common data repository public interface.
 
 Best of all you can use 2 cache handlers (one for DB queries and another one for Retry Idempotence/REST API requests) in the same chain of handlers behind a single abstraction.
 
