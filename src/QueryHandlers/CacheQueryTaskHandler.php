@@ -9,6 +9,7 @@ use Groquel\Laravel\QueryHandlerTasks\EloquentQueryBuilderTask;
 
 use Illuminate\Support\Facades\Cache as QueryCache;
 use Illuminate\Support\Facades\Config as QueryConfig;
+use Illuminate\Support\Facades\Redis;
 
 final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
   /**
@@ -47,8 +48,9 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     $sql = $queryTask->getQuerySqlString();
 
     if ($sql !== "|") {
+      /* @NOTE: Cannot cache select queries that contain JOIN clauses as caching those would be error-prone */
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
-        and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
+        and (strpos(strtolower($sql), "with_join") === false);
       $isSQLDatabaseQueryTask = true
     }
 
@@ -58,7 +60,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     }
 
     /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
-    $queryHash = md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1);
+    $queryHash = md5(substr($sql, 0, strpos($sql, "|"))). "|" .$queryTask->getQueryBuilderTableName();
     $isCacheHit = $this->canQuery($queryHash);
 
     if ($isCacheHit) {
@@ -82,9 +84,29 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     /* @HINT: $sql = "select * from users|users" */
     $sql = $queryTask->getQuerySqlString();
 
-    if (isset($result) and $sql !== "|") {
+    if ($sql !== "|" and strpos(strtolower($sql), "select") === false) {
+        /* @HINT: This might be a mutation query (e.g. `insert`, `delete` or `update` query) */
+        /* @NOTE: mutation queries trigger an invalidation of queries based on table names */
+        $prefix = QueryConfig::get("cache.prefix", "laravel_cache:");
+        $pattern = "|".$queryTask->getQueryBuilderTableName();
+        $redis = QueryCache::getStore()->client();
+        
+        // @INFO: Use the KEYS command in develpoment/small datasets & use SCAN for production/large datasets
+        $storedKeys = $redis->keys(
+            $prefix .'*'. $pattern
+        );
+        
+        foreach ($storedKeys as $key) {
+            // @HINT: Extract the original key name
+            $originalKey = str_replace($redis->getOption(Redis::OPT_PREFIX), '', $key);
+            QueryCache::forget($originalKey);
+        }
+        return;
+    }
+
+    if ($sql !== "|" and isset($result)) {
       $canProceedWithProcessing = (strtolower(substr($sql, 0, 6)) === "select" or strtolower(substr($sql, 0, 10)) === "db_select:")
-        and (strpos(strtolower($sql), "join") === false or strpos(strtolower($sql), ";join") === false);
+        and (strpos(strtolower($sql), "with_join") === false);
       $isSQLDatabaseQueryTask = true
     }
 
@@ -93,7 +115,7 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     }
 
     /* @HINT: $queryHash = "19a1f14efc0f221d30afcb1e1344bebd|users" */
-    $queryHash = md5(substr($sql, 0, strpos($sql, "|")))."|".substr($sql, strpos($sql, "|"), strlen($sql) - 1);
+    $queryHash = md5(substr($sql, 0, strpos($sql, "|"))). "|" .$queryTask->getQueryBuilderTableName();
     $ttl = QueryConfig::get("groquel.handler.cache.ttl", 2300); // @HINT: integer value
     $isCacheMiss = !$this->canQuery($queryHash);
 
@@ -110,8 +132,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     * @return void
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
-    $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Cache query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
+    $queryKey = $queryTask->getQueryKey();
+    throw new Exception("Cache query task='".$queryKey."' failed; reason: ('".$error->getMessage()."')");
   }
 
   /**
@@ -121,8 +143,8 @@ final class CacheQueryTaskHandler extends StorageQueryTaskHandler {
     * @return string|array|object
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
-    $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Cache query task='".$queryName."' failed; reason: unknown");
+    $queryKey = $queryTask->getQueryKey();
+    throw new Exception("Cache query task='".$queryKey."' failed; reason: unknown");
   }
 }
 
