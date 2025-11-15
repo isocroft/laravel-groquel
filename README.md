@@ -198,7 +198,7 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
 
     $this->executeGetOnQuery(
       $queryOneBuilder->sharedLock()
-    )->setQueryKey("db_select|".$tableName."|with_lock");
+    )->setQueryKey("db_select:|"."with_lock|".$tableName);
 
     $this->executeGetOnQuery(
       function (array $arguments) use ($context) {
@@ -206,10 +206,10 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
 
         return $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status');
       }
-    )->setQueryKey("db_select|".$tableName."|with_modifiers");
+    )->setQueryKey("db_select:|".$tableName."|with_modifiers");
 
     $results = $this->executeAllAndReturnResults();
-    return $results["db_select|".$tableName."|with_modifiers"];
+    return $results["db_select|"."with_modifiers|".$tableName];
   }
 }
 
