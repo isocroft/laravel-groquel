@@ -113,7 +113,6 @@ abstract class StorageQueryTaskHandler {
 
   /**
    * @param StorageQueryTask $queryTask
-   * @throws Exception
    *
    * @return StorageQueryTask
    */
