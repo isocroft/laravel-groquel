@@ -206,7 +206,7 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
 
         return $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status');
       }
-    )->setQueryKey("db_select:|".$tableName."|with_modifiers");
+    )->setQueryKey("db_select:|"."with_modifiers|".$tableName);
 
     $results = $this->executeAllAndReturnResults();
     return $results["db_select|"."with_modifiers|".$tableName];
@@ -227,7 +227,7 @@ use App\Services\Storage\UserTableRepository;
 use App\Extensions\Helpers\RetryIdempotencyStorageQueryHandler;
 use Groquel\Laravel\GroquelServiceProvider;
 
-class AllRepositoriesServiceProvider extends GroquelServiceProvider {
+class RepositoriesServiceProvider extends GroquelServiceProvider {
   /**
    * Register any application services.
    */
@@ -242,12 +242,16 @@ class AllRepositoriesServiceProvider extends GroquelServiceProvider {
     });
 
     $this->app->singleton(UserTableRepository::class, function ($app) {
-      $newQueryHandlersList = [
-        $app['QueryHandlersList'][0],
-        $app->make(RetryIdempotencyCacheStorageQueryHandler::class),
-        $app['QueryHandlersList'][1]
+      [$cacheStorageQueryHandler, $databaseStorageQueryHandler] = $app['QueryHandlersList'];
+      $idempotencyCacheStorageQueryHandler = $app->make(RetryIdempotencyCacheStorageQueryHandler::class);
+      
+      $customStorageQueryHandlersList = [
+        $cacheStorageQueryHandler,
+        $idempotencyCacheStorageQueryHandler,
+        $databaseStorageQueryHandler
       ];
-      return new UserTableRepository($newQueryHandlersList, $app->make('App\Models\User'));
+      
+      return new UserTableRepository($customStorageQueryHandlersList, $app->make('App\Models\User'));
     });
   }
 }
