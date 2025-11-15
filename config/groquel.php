@@ -1,13 +1,11 @@
 <?php
 
 return [
-  "groquel" => [
     "handler" => [
       "cache" => [
-        "ttl" => 0
+        "ttl" => 2300
       ]
     ]
-  ]
 ];
 
 ?>
