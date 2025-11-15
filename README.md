@@ -53,7 +53,7 @@ final class CacheThroughService {
     $didUdpate = $affectedRows > 0;
 
     if ($didUdpate) {
-      return $builder->getModel()->newInstance($data, true);
+      return $builder->getModel()->where($data)->first();
     }
 
     return $builder->getModel()->newInstance([]);
@@ -242,7 +242,6 @@ class AllRepositoriesServiceProvider extends GroquelServiceProvider {
     $this->app->singleton(UserTableRepository::class, function ($app) {
       $newQueryHandlersList = [
         $app['QueryHandlersList'][0],
-        /* This handler implements idempotency for HTTP requests */
         $app->make(RetryIdempotencyCacheStorageQueryHandler::class),
         $app['QueryHandlersList'][1]
       ];
