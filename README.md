@@ -62,7 +62,7 @@ final class CacheThroughService {
   public function queryOperation (string $key, QueryBuilder $builder, int $timeInMinutes = 5): Collection {
     $cacheData = NULL;
     
-    /* @HINT: Combining the Write-around & Cache-aside strategies for the cache */
+    /* @HINT: Combining the write-around & cache-through strategies for this cache */
     if (Cache::has($key)) {
       $cacheData = Cache::get($key, $builder->getModel()->newCollection([]));
     } else {
