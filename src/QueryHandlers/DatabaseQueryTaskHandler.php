@@ -75,8 +75,8 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     * @return void
     */
   protected function finalizeProcessingWithError(EloquentQueryBuilderTask $queryTask, Exception $error): void {
-    $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Database query task='".$queryName."' failed; reason: ('".$error->getMessage()."')");
+    $queryKey = $queryTask->getQueryKey();
+    throw new Exception("Database query task='".$queryKey."' failed; reason: ('".$error->getMessage()."')");
   }
 
   /**
@@ -86,8 +86,8 @@ final class DatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     * @return string|array|object
     */
   protected function alternateProcessing(EloquentQueryBuilderTask $queryTask) {
-    $queryName = $queryTask->getQueryTaskName();
-    throw new Exception("Database query task='".$queryName."' failed; reason: unknown");
+    $queryKey = $queryTask->getQueryKey();
+    throw new Exception("Database query task='".$queryKey."' failed; reason: unknown");
   }
 }
 
