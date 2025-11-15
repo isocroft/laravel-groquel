@@ -180,7 +180,7 @@ See below:
 ```php
 <?php
 
-namespace App\Services\Database;
+namespace App\Services\Storage;
 
 use App\Models\User;
 use Groquel\Laravel\QueryRepository\SQLDatabaseTableRepository;
@@ -219,9 +219,11 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
 Create custom service provider using the data repository created above
 
 ```php
+<?php
 
 namespace App\Providers;
- 
+
+use App\Services\Storage\UserTableRepository;
 use App\Extensions\Helpers\RetryIdempotencyStorageQueryHandler;
 use Groquel\Laravel\GroquelServiceProvider;
 
@@ -249,4 +251,6 @@ class AllRepositoriesServiceProvider extends GroquelServiceProvider {
     });
   }
 }
+
+?>
 ```
