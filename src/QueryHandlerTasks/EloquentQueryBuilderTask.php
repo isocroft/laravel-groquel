@@ -83,9 +83,11 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
    */
   public function getQueryBuilderSqlString (): string {
     if (!is_callable($this->queryBuilder)) {
-      if (method_exists($this->queryBuilder, 'toSql')) {
+      if (!method_exists($this->queryBuilder, 'toRawSql')) {
         return Str::replaceArray('?', $this->queryBuilder->getBindings(), $this->queryBuilder->toSql());
       }
+      // @NOTE: `toRawSql()` was added in Laravel v10.15.x+
+      return $this->queryBuilder->toRawSql();
     }
     return "";
   }
@@ -94,14 +96,14 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
    * @param string $newQueryTaskName
    * @return void
    */
-  public function setQueryTaskName (string $newQueryTaskName): void {
+  public function setQueryKey (string $newQueryTaskName): void {
     $this->queryTaskName = $newQueryTaskName;
   }
 
   /**
    * @return string
    */
-  public function getQueryTaskName (): string {
+  public function getQueryKey (): string {
     return $this->queryTaskName;
   }
 
@@ -118,7 +120,7 @@ final class EloquentQueryBuilderTask implements StorageQueryTask {
    */
   public function getQuerySqlString (): string {
     if ($this->queryBuilder instanceof Closure) {
-      return $this->getQueryTaskName();
+      return $this->getQueryKey();
     }
 
     $sqlQueryString = $this->getQueryBuilderSqlString();
