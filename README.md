@@ -7,7 +7,7 @@ Also, this package makes setting up caching of database queries a breeze using a
 
 ## How To / Setup
 
-Basically, this package abstracts the need for a cache or a set of ata sources (e.g. PosgreSQL DB, MongoDB, Redis, a JSON file on disk, REST API) into a chain of query-handlers in a fault-tolerant way.
+Basically, this package abstracts the need for a cache or a set of data sources (e.g. PosgreSQL DB, MongoDB, Redis, a JSON file on disk, REST API) into a chain of query-handlers in a fault-tolerant way.
 
 - One handler for a cache (Redis - could be read-only)
 - One handler for the main database (PosgreSQL - could be write-only or read-write)
@@ -149,9 +149,11 @@ class PostController extends Controller
         
         if (count($post->toArray()) > 0) {
             /* @HINT:
-                    Just like in Tanstack Query where immediately after a mutation, `queryClient.invalidateQueries(...)` is called,
-                    the `$this->cacheThroughService->invalidateCacheContentOperation(...)` does the same to clear the cache of any
-                    previous entry using the `md5(...)` hash of the `toRawSql()` as the query key.
+                    Just like in Tanstack Query where immediately after 
+                    a mutation, `queryClient.invalidateQueries(...)` is called,
+                    the `$this->cacheThroughService->invalidateCacheContentOperation(...)`
+                    does the same to clear the cache of any previous entry using
+                    the `md5(...)` hash of the `toRawSql()` as the query key.
             */ 
             $this->cacheService->invalidateCacheContent(
                 // @NOTE: `->toRawSql()` was added in Laravel v10.15+ 
@@ -204,7 +206,9 @@ final class UserTableRepository extends SQLDatabaseTableRepository {
       function (array $arguments) use ($context) {
         $innerQueryBuilder = $context->getQueryBuilder();
 
-        return $innerQueryBuilder->orderBy('created_at', 'desc')->groupBy('status');
+        return $innerQueryBuilder->orderBy(
+          'created_at', 'desc'
+        )->groupBy('status');
       }
     )->setQueryKey("db_select:|"."with_modifiers|".$tableName);
 
@@ -243,7 +247,9 @@ class RepositoriesServiceProvider extends GroquelServiceProvider {
 
     $this->app->singleton(UserTableRepository::class, function ($app) {
       [$cacheStorageQueryHandler, $databaseStorageQueryHandler] = $app['QueryHandlersList'];
-      $idempotencyCacheStorageQueryHandler = $app->make(RetryIdempotencyCacheStorageQueryHandler::class);
+      $idempotencyCacheStorageQueryHandler = $app->make(
+        RetryIdempotencyCacheStorageQueryHandler::class
+      );
       
       $customStorageQueryHandlersList = [
         $cacheStorageQueryHandler,
@@ -251,7 +257,10 @@ class RepositoriesServiceProvider extends GroquelServiceProvider {
         $databaseStorageQueryHandler
       ];
       
-      return new UserTableRepository($customStorageQueryHandlersList, $app->make('App\Models\User'));
+      return new UserTableRepository(
+        $customStorageQueryHandlersList,
+        $app->make('App\Models\User')
+      );
     });
   }
 }
