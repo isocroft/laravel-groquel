@@ -191,22 +191,25 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 final class UserManagement extends SQLDatabaseTableRepository {
 
+  public function getRootModelFullClassName () {
+    return 'App\Models\User';
+  }
+
   public function getAllActiveUsers () {
-    $context = &$this;
-    $queryOneBuilder = User::where(function (Builder $query) {
+    $queryOneBuilder = $this->addWhereClauses($this->getQueryBuilder(), function (QueryBuilder $query) {
       $query->whereNot('status', '=', 'suspended');
     });
-    $tableName = User::query()->getModel()->getTable();
+    $tableName = $this->getTableName();
 
     $this->executeGetOnQuery(
       $queryOneBuilder->sharedLock()
     )->setQueryKey("db_select:|"."with_lock|".$tableName);
 
     $this->executeGetOnQuery(
-      function (array $arguments) use ($context) {
-        $innerQueryBuilder = $context->getQueryBuilder();
+      function (array $arguments) {
+        $innerQueryBuilder = $this->getQueryBuilder();
 
-        return $innerQueryBuilder->orderBy(
+        return $innerQueryBuilder->whereNotIn(array_column($arguments, 'id'))->orderBy(
           'created_at', 'desc'
         )->groupBy('status');
       }
