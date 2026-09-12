@@ -189,7 +189,7 @@ use Groquel\Laravel\QueryRepository\SQLDatabaseTableRepository;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
-final class UserTableRepository extends SQLDatabaseTableRepository {
+final class UserManagement extends SQLDatabaseTableRepository {
 
   public function getAllActiveUsers () {
     $context = &$this;
@@ -227,7 +227,7 @@ Create custom service provider using the data repository created above
 
 namespace App\Providers;
 
-use App\Services\Storage\UserTableRepository;
+use App\Services\Storage\UserManagement;
 use App\Extensions\Helpers\RetryIdempotencyStorageQueryHandler;
 use Groquel\Laravel\GroquelServiceProvider;
 
@@ -245,7 +245,7 @@ class RepositoriesServiceProvider extends GroquelServiceProvider {
       return new RetryIdempotencyCacheStorageQueryHandler("Error message for skipping handler");
     });
 
-    $this->app->singleton(UserTableRepository::class, function ($app) {
+    $this->app->singleton(UserManagement::class, function ($app) {
       [$cacheStorageQueryHandler, $databaseStorageQueryHandler] = $app['QueryHandlersList'];
       $idempotencyCacheStorageQueryHandler = $app->make(
         RetryIdempotencyCacheStorageQueryHandler::class
@@ -257,7 +257,7 @@ class RepositoriesServiceProvider extends GroquelServiceProvider {
         $databaseStorageQueryHandler
       ];
       
-      return new UserTableRepository(
+      return new UserManagement(
         $customStorageQueryHandlersList,
         $app->make('App\Models\User')
       );
