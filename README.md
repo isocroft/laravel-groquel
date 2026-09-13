@@ -197,7 +197,7 @@ final class UserManagement extends SQLDatabaseTableRepository {
 
   public function getAllActiveUsers () {
     $queryOneBuilder = $this->addWhereClauses($this->getQueryBuilder(), function (QueryBuilder $query) {
-      $query->whereNot('status', '=', 'suspended');
+      $query->where('status', '=', 'suspended');
     });
     $tableName = $this->getTableName();
 
@@ -209,9 +209,9 @@ final class UserManagement extends SQLDatabaseTableRepository {
       function (array $arguments) {
         $innerQueryBuilder = $this->getQueryBuilder();
 
-        return $innerQueryBuilder->whereNotIn(array_column($arguments, 'id'))->orderBy(
+        return $innerQueryBuilder->whereNotIn('id', array_column($arguments, 'id'))->orderBy(
           'created_at', 'desc'
-        )->groupBy('status');
+        )->groupBy('gender');
       }
     )->setQueryKey("db_select:|"."with_modifiers|".$tableName);
 
